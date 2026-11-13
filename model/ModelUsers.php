@@ -7,7 +7,7 @@ class ModelUsers extends AbstractModel{
     private string $email;
     private string $password;
     private string $createdAt;
-    private string $role;
+    private int $role;
 
     //CONSTRUCTEUR
 

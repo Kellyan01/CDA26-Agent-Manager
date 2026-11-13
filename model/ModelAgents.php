@@ -5,9 +5,9 @@ class ModelAgents extends AbstractModel{
     private string $name;
     private string $dob;
     private string $createdAt;
-    private string $tier;
-    private string $archetype;
-    private string $team;
+    private int $tier;
+    private int $archetype;
+    private int $team;
 
     //CONSTRUCTEUR
 

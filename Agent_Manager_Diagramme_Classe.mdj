@@ -823,7 +823,7 @@
 											"top": 242,
 											"width": 201.93798828125,
 											"height": 13,
-											"text": "-archetype: string",
+											"text": "-archetype: int",
 											"horizontalAlignment": 0
 										},
 										{
@@ -840,7 +840,7 @@
 											"top": 257,
 											"width": 201.93798828125,
 											"height": 13,
-											"text": "-tier: string",
+											"text": "-tier: int",
 											"horizontalAlignment": 0
 										},
 										{
@@ -857,7 +857,7 @@
 											"top": 272,
 											"width": 201.93798828125,
 											"height": 13,
-											"text": "-team: string",
+											"text": "-team: int",
 											"horizontalAlignment": 0
 										},
 										{
@@ -3910,7 +3910,7 @@
 											"top": 504,
 											"width": 164.11865234375,
 											"height": 13,
-											"text": "-role: string",
+											"text": "-role: int",
 											"horizontalAlignment": 0
 										}
 									],
@@ -5917,7 +5917,7 @@
 							},
 							"name": "archetype",
 							"visibility": "private",
-							"type": "string"
+							"type": "int"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -5927,7 +5927,7 @@
 							},
 							"name": "tier",
 							"visibility": "private",
-							"type": "string"
+							"type": "int"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -5937,7 +5937,7 @@
 							},
 							"name": "team",
 							"visibility": "private",
-							"type": "string"
+							"type": "int"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -6770,7 +6770,7 @@
 							},
 							"name": "role",
 							"visibility": "private",
-							"type": "string"
+							"type": "int"
 						}
 					],
 					"operations": [
