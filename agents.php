@@ -2,226 +2,251 @@
 //Démarrer la session
 session_start();
 
-//Variable d'affichage
-$title = "Agents of Shield";
-$listAgents = [];
-$tiers = [];
-$archetypes = [];
-$message = "";
+//Import des ressources
+include './model/ModelAgents.php';
+include './model/ModelArchetypes.php';
+include './model/ModelTiers.php';
+include './view/ViewHeader.php';
+include './view/ViewAgents.php';
 
-//Accessible uniquement si connecté
-if(!isset($_SESSION["id"])){
-    //non connecté -> redirection vers accueil
-    header('Location:index.php');
-    exit;
-}
+class ControllerAgent{
+    //ATTRIBUT
+    private ModelAgents $modelAgent;
+    private ModelTiers $modelTier;
+    private ModelArchetypes $modelArchetype;
+    private ViewHeader $header;
+    private ViewAgent $agent;
 
-//RECUPERATION DE LA LISTE DES TIERS ET DES ARCHETYPES
-try{
-    //Création du PDO
-    $pdo = new PDO("mysql:host=localhost;dbname=agent_manager","root","root",[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
-    
-    //Préparation de la requêt pour Tier
-    $request = $pdo->prepare("SELECT t.Id_Tier, t.tier FROM tiers t");
-    //Execution
-    $request->execute();
-    //Récupération
-    $tiers = $request->fetchAll(PDO::FETCH_ASSOC);
+    //CONSTRUCTEUR
+    public function __construct(ModelAgents $modelAgent, ModelTiers $modelTier, ModelArchetypes $modelArchetype, ViewHeader $header, ViewAgent $agent){
+        $this->modelAgent = $modelAgent;
+        $this->modelTier = $modelTier;
+        $this->modelArchetype = $modelArchetype;
+        $this->header = $header;
+        $this->agent = $agent;
+    }
 
-    //Préparation de la requêt pour Archetype
-    $request = $pdo->prepare("SELECT a.Id_Archetype, a.archetype FROM archetypes a");
-    //Execution
-    $request->execute();
-    //Récupération
-    $archetypes = $request->fetchAll(PDO::FETCH_ASSOC);
+    //GETTER ET SETTER
+    /**
+     * Get the value of modelAgent
+     *
+     * @return ModelAgents
+     */
+    public function getModelAgent(): ModelAgents {
+        return $this->modelAgent;
+    }
 
-}catch(Exception $error){
-    http_response_code(500);
-    $message = $error->getMessage();
-}
+    /**
+     * Set the value of modelAgent
+     *
+     * @param ModelAgents $modelAgent
+     *
+     * @return self
+     */
+    public function setModelAgent(ModelAgents $modelAgent): self {
+        $this->modelAgent = $modelAgent;
+        return $this;
+    }
 
-//ENREGISTREMENT D'UN AGENT
-//1. Vérifier si on reçoit le formulaire
-if(isset($_POST["submit"])){
-    //2. Normaliser les données
-    $name = trim($_POST["name"]);
-    $dob = trim($_POST["dob"]);
-    $tier = trim($_POST["tier"]);
-    $archetype = trim($_POST["archetype"]);
+    /**
+     * Get the value of modelTier
+     *
+     * @return ModelTiers
+     */
+    public function getModelTier(): ModelTiers {
+        return $this->modelTier;
+    }
 
-    //3. Vérifier les champs vides
-    if(!empty($name) && !empty($dob) && !empty($tier) && !empty($archetype)){
-        //4. Vérifier le format de donnée
-        if(filter_var($tier,FILTER_VALIDATE_INT)){
-            if(filter_var($archetype,FILTER_VALIDATE_INT)){
-                
-                try{
-                    //Création du PDO
-                    $pdo = new PDO("mysql:host=localhost;dbname=agent_manager","root","root",[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
-                    //5. Vérifier si le nom est disponible
-                    //5.1 Préparation de la requête
-                    $request = $pdo->prepare("SELECT a.name FROM agents a WHERE a.name = ?");
+    /**
+     * Set the value of modelTier
+     *
+     * @param ModelTiers $modelTier
+     *
+     * @return self
+     */
+    public function setModelTier(ModelTiers $modelTier): self {
+        $this->modelTier = $modelTier;
+        return $this;
+    }
 
-                    //5.2 BindParam
-                    $request->bindParam(1,$name,PDO::PARAM_STR);
+    /**
+     * Get the value of modelArchetype
+     *
+     * @return ModelArchetypes
+     */
+    public function getModelArchetype(): ModelArchetypes {
+        return $this->modelArchetype;
+    }
 
-                    //5.3 Exécution
-                    $request->execute();
+    /**
+     * Set the value of modelArchetype
+     *
+     * @param ModelArchetypes $modelArchetype
+     *
+     * @return self
+     */
+    public function setModelArchetype(ModelArchetypes $modelArchetype): self {
+        $this->modelArchetype = $modelArchetype;
+        return $this;
+    }
 
-                    //5.4 Récupération
-                    $data = $request->fetch(PDO::FETCH_ASSOC);
+    /**
+     * Get the value of header
+     *
+     * @return ViewHeader
+     */
+    public function getHeader(): ViewHeader {
+        return $this->header;
+    }
 
-                    //5.5 Vérification si $data vide
-                    if(empty($data)){
-                        //6. Vérifier si l'archetype existe
-                        //6.1 Préparation de la requête
-                        $request = $pdo->prepare("SELECT a.archetype FROM archetypes a WHERE a.Id_Archetype = ?");
+    /**
+     * Set the value of header
+     *
+     * @param ViewHeader $header
+     *
+     * @return self
+     */
+    public function setHeader(ViewHeader $header): self {
+        $this->header = $header;
+        return $this;
+    }
 
-                        //6.2 BindParam
-                        $request->bindParam(1,$archetype,PDO::PARAM_INT);
+    /**
+     * Get the value of agent
+     *
+     * @return ViewAgent
+     */
+    public function getAgent(): ViewAgent {
+        return $this->agent;
+    }
 
-                        //6.3 Exécution
-                        $request->execute();
+    /**
+     * Set the value of agent
+     *
+     * @param ViewAgent $agent
+     *
+     * @return self
+     */
+    public function setAgent(ViewAgent $agent): self {
+        $this->agent = $agent;
+        return $this;
+    }
 
-                        //6.4 Récupération
-                        $data = $request->fetch(PDO::FETCH_ASSOC);
+    //METHODS
+    public function isConnected():void{
+        //Accessible uniquement si connecté
+        if(!isset($_SESSION["id"])){
+            //non connecté -> redirection vers accueil
+            header('Location:index.php');
+            exit;
+        }
+    }
 
-                        //6.5 Vérification si $data vide
-                        if(!empty($data)){
-                            //7. Vérifier si le tier existe
-                            //7.1 Préparation de la requête
-                            $request = $pdo->prepare("SELECT t.tier FROM tiers t WHERE t.Id_Tier = ?");
+    public function registerAgent():string{
+        //1. Vérifier si on reçoit le formulaire
+        if(isset($_POST["submit"])){
+            //2. Normaliser les données
+            $name = trim($_POST["name"]);
+            $dob = trim($_POST["dob"]);
+            $tier = trim($_POST["tier"]);
+            $archetype = trim($_POST["archetype"]);
 
-                            //7.2 BindParam
-                            $request->bindParam(1,$tier,PDO::PARAM_INT);
+            //3. Vérifier les champs vides
+            if(!empty($name) && !empty($dob) && !empty($tier) && !empty($archetype)){
+                //4. Vérifier le format de donnée
+                if(filter_var($tier,FILTER_VALIDATE_INT)){
+                    if(filter_var($archetype,FILTER_VALIDATE_INT)){
+                        
+                        $data = $this->modelAgent->setName($name)->findByName();
 
-                            //7.3 Exécution
-                            $request->execute();
+                        //5.5 Vérification si $data vide
+                        if(empty($data)){
+                            //6. Vérifier si l'archetype existe
+                                //6.4 Récupération
+                                $data = $this->modelArchetype->setId($archetype)->findById();
 
-                            //7.4 Récupération
-                            $data = $request->fetch(PDO::FETCH_ASSOC);
+                                //6.5 Vérification si $data vide
+                                if(!empty($data)){
+                                    //7. Vérifier si le tier existe
+                                    $data = $this->modelTier->setId($tier)->findById();
 
-                            //7.5 Vérification si $data vide
-                            if(!empty($data)){
-                                //8. Lancer l'enregistrement
-                                //8.1 Préparation de la requête
-                                $request = $pdo->prepare("INSERT INTO agents (`name`,dob,Id_Tier, Id_Archetype) VALUES (?,?,?,?)");
+                                    //7.5 Vérification si $data vide
+                                    if(!empty($data)){
+                                        //8. Lancer l'enregistrement
+                                        $this->modelAgent->setDob($dob)->setTier($tier)->setArchetype($archetype)->add();
 
-                                //8.2 BindParam
-                                $request->bindParam(1,$name,PDO::PARAM_STR);
-                                $request->bindParam(2,$dob,PDO::PARAM_STR);
-                                $request->bindParam(3,$tier,PDO::PARAM_INT);
-                                $request->bindParam(4,$archetype,PDO::PARAM_INT);
+                                        //8.4 Message
+                                        return htmlspecialchars($name)." a été enregistré.";
 
-                                //8.3 Execution
-                                $request->execute();
+                                    }else{
+                                        return "Ce Tier n'existe pas";
+                                    }
 
-                                //8.4 Message
-                                $message = htmlspecialchars($name)." a été enregistré.";
-
+                                }else{
+                                    return "Cet Archetype n'existe pas";
+                                }
+                                
                             }else{
-                                $message = "Ce Tier n'existe pas";
+                                return "Ce nom n'est pas disponible.";
                             }
-                            //8. Lancer l'enregistrement
-
-                        }else{
-                            $message = "Cet Archetype n'existe pas";
-                        }
                         
                     }else{
-                        $message = "Ce nom n'est pas disponible.";
+                        return "Archetype est invalide";
                     }
-
-                    
-                }catch(Exception $error){
-                    http_response_code(500);
-                    $message = $error->getMessage();
+                }else{
+                    return "Le Tier est invalide";
                 }
                 
             }else{
-                $message = "Archetype est invalide";
+                return "Remplissez tous les champs.";
             }
-        }else{
-            $message = "Le Tier est invalide";
         }
-        
-    }else{
-        $message = "Remplissez tous les champs.";
+
+        return "";
     }
+
+    public function displayAgents():array | string{
+        return $this->modelAgent->findAll();
+    }
+
+    public function render():void{
+        $this->isConnected();
+
+        $this->agent->setMessage($this->registerAgent());
+
+        $data = $this->displayAgents();
+
+        if(gettype($data) === "array"){
+            $this->agent->setListAgents($data);
+        }else{
+            $this->agent->setMessage($data);
+        }
+
+        $tiers = $this->getModelTier()->findAll();
+        $archetype = $this->getModelArchetype()->findAll();
+
+        $this->header->displayHeader();
+        $this->agent->setTiers($tiers)->setArchetypes($archetype)->display();
+
+    }
+
 }
 
-//LISTES DES AGENTS
-try{
-    //Création du PDO
-    $pdo = new PDO("mysql:host=localhost;dbname=agent_manager","root","root",[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+//Creation des Modèles
+$pdo = new PDO("mysql:host=localhost;dbname=agent_manager","root","root");
 
-    //Préparation de la requête
-    $request = $pdo->prepare("SELECT a.Id_Agent, a.name, a.dob, a.created_at, t.tier, ac.archetype, te.team_name FROM agents a INNER JOIN tiers t ON t.Id_Tier = a.Id_Tier INNER JOIN archetypes ac ON ac.Id_Archetype = a.Id_Archetype LEFT JOIN Teams te ON te.Id_Team = a.Id_Team");
+$modelAgent = new ModelAgents($pdo);
+$modelArchetype = new ModelArchetypes($pdo);
+$modelTier = new ModelTiers($pdo);
 
-    //Execution
-    $request->execute();
+//Création des Views
+$header = new ViewHeader("Agents Of Shield");
+$agent = new ViewAgent();
 
-    //Récupère
-    $listAgents = $request->fetchAll(PDO::FETCH_ASSOC);
-}catch(Exception $error){
-   http_response_code(500);
-   $message = $error->getMessage();
-}
+//Controller
+$controller = new ControllerAgent($modelAgent,$modelTier,$modelArchetype,$header,$agent);
+
+//Lancement du rendu
+$controller->render();
 
 
-//Inscription d'un nouvel agent (attention : ne pas oublie le tier et l'archetype)
-//Affichage de la liste des agents
-
-include './header.php';
-?>
-
-    <main>
-        <h1>Agents of Shield</h1>
-        <section>
-            <h2>Enregistrement d'un agent</h2>
-            <form action="" method="post">
-                <label for="name">Nom : <input id="name" type="text" name="name"></label>
-                <label for="dob">Date de naissance : <input id="dob" type="text" name="dob"></label>
-                <label for="tier">Tier : <select name="tier" id="tier">
-                    <?php
-                        //Affichage des options pour le Tier
-                        foreach($tiers as $tier){
-                    ?>
-                            <option value="<?php echo(htmlspecialchars($tier['Id_Tier'])) ?>"><?php echo(htmlspecialchars($tier['tier'])) ?></option>
-                    <?php
-                        }
-                    ?>
-                    </select>
-                </label>
-                <label for="archetype">Archetype : <select name="archetype" id="archetype">
-                    <?php
-                        //Affichage des options pour le Tier
-                        foreach($archetypes as $archetype){
-                    ?>
-                            <option value="<?php echo(htmlspecialchars($archetype['Id_Archetype'])) ?>"><?php echo(htmlspecialchars($archetype['archetype'])) ?></option>
-                    <?php
-                        }
-                    ?>
-                    </select>
-                </label>
-                <input type="submit" name="submit">
-            </form>
-            <p><?php echo($message) ?></p>
-        </section>
-        <section>
-            <h2>Liste des agents</h2>
-            <ul>
-                <?php
-                    foreach($listAgents as $agent){
-                ?>
-                        <li><?php 
-                        //Affichage des données avec nettoyage du code malveillant
-                        echo(htmlspecialchars($agent['name'])." - ".htmlspecialchars($agent['archetype'])." - ".htmlspecialchars($agent['dob'])." - ".htmlspecialchars($agent['created_at'])." - ".htmlspecialchars($agent['tier'])) ?></li>
-                <?php
-                    }
-                ?>
-            </ul>
-        </section>
-    </main>
-</body>
-</html>
