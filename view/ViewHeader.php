@@ -2,7 +2,7 @@
 //Header commun à inclure dans les pages
 //Navigation dynamique selon l'état connecté ou non
 
-class ViewHeader {
+class ViewHeader implements View{
     //ATTRIBUT
     private string $title;
 
@@ -34,7 +34,7 @@ class ViewHeader {
     }
 
     //METHOD
-    public function displayHeader(){
+    public function display():void{
     ?>
 
         <!DOCTYPE html>

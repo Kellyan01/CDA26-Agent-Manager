@@ -1,7 +1,7 @@
 <?php
 
-class ViewCompte{
-    public function display(){
+class ViewCompte implements View{
+    public function display():void{
 ?>
     <main>
             <h2>Mon Compte</h2>

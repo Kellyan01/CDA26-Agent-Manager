@@ -1,14 +1,10 @@
 <?php
-class ModelTiers {
+class ModelTiers extends AbstractModel{
     //ATTRIBUT
     private int $id;
     private string $tier;
-    private PDO $pdo;
 
     //CONSTRUCTEUR
-    public function __construct(PDO $newPDO){
-        $this->pdo = $newPDO;
-    }
 
     //GETTER ET SETTER
     /**
@@ -53,33 +49,12 @@ class ModelTiers {
         return $this;
     }
 
-    /**
-     * Get the value of pdo
-     *
-     * @return PDO
-     */
-    public function getPdo(): PDO {
-        return $this->pdo;
-    }
-
-    /**
-     * Set the value of pdo
-     *
-     * @param PDO $pdo
-     *
-     * @return self
-     */
-    public function setPdo(PDO $pdo): self {
-        $this->pdo = $pdo;
-        return $this;
-    }
-
     //METHOD
     public function findAll():array | string{
         try{
             
             //Préparation de la requêt pour Tier
-            $request = $this->pdo->prepare("SELECT t.Id_Tier, t.tier FROM tiers t");
+            $request = $this->getPdo()->prepare("SELECT t.Id_Tier, t.tier FROM tiers t");
             //Execution
             $request->execute();
             //Récupération
@@ -95,7 +70,7 @@ class ModelTiers {
         try{
             
             //Préparation de la requêt pour Archetype
-            $request = $this->pdo->prepare("SELECT t.tier FROM tiers t WHERE t.Id_Tier = ?");
+            $request = $this->getPdo()->prepare("SELECT t.tier FROM tiers t WHERE t.Id_Tier = ?");
             //BindParam
             $request->bindParam(1,$this->id,PDO::PARAM_INT);
             //Execution

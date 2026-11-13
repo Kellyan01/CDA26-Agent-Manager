@@ -9,89 +9,22 @@
 session_start();
 
 //Import des ressources
+include './AbstractController.php';
+include './model/AbstractModel.php';
 include './model/ModelUsers.php';
+include './view/View.php';
 include './view/ViewHeader.php';
 include './view/ViewAccueil.php';
 
-class ControllerAccueil{
+class ControllerAccueil extends AbstractController{
     //ATTRIBUT
-    private ModelUsers $modelUser;
-    private ViewHeader $header;
-    private ViewAccueil $accueil;
 
     //CONSTRUCTEUR
-    public function __construct(ModelUsers $modelUser, ViewHeader $header, ViewAccueil $accueil){
-        $this->modelUser = $modelUser;
-        $this->header = $header;
-        $this->accueil = $accueil;
-    }
 
     //GETTER ET SETTER
-    /**
-     * Get the value of modelUser
-     *
-     * @return ModelUser
-     */
-    public function getModelUser(): ModelUser {
-        return $this->modelUser;
-    }
-
-    /**
-     * Set the value of modelUser
-     *
-     * @param ModelUser $modelUser
-     *
-     * @return self
-     */
-    public function setModelUser(ModelUser $modelUser): self {
-        $this->modelUser = $modelUser;
-        return $this;
-    }
-
-    /**
-     * Get the value of header
-     *
-     * @return ViewHeader
-     */
-    public function getHeader(): ViewHeader {
-        return $this->header;
-    }
-
-    /**
-     * Set the value of header
-     *
-     * @param ViewHeader $header
-     *
-     * @return self
-     */
-    public function setHeader(ViewHeader $header): self {
-        $this->header = $header;
-        return $this;
-    }
-
-    /**
-     * Get the value of accueil
-     *
-     * @return ViewAccueil
-     */
-    public function getAccueil(): ViewAccueil {
-        return $this->accueil;
-    }
-
-    /**
-     * Set the value of accueil
-     *
-     * @param ViewAccueil $accueil
-     *
-     * @return self
-     */
-    public function setAccueil(ViewAccueil $accueil): self {
-        $this->accueil = $accueil;
-        return $this;
-    }
 
     //METHOD
-    public function registerManager(){
+    public function registerManager():string{
         //INSCRIPTION MANAGER
         //1. Vérifier la réception du formulaire d'inscription
         if(isset($_POST['submit'])){
@@ -112,11 +45,11 @@ class ControllerAccueil{
                         $password = password_hash($_POST["password"],PASSWORD_DEFAULT);
 
                         //6. Vérifier si l'email est disponible
-                        $data = $this->modelUser->setEmail($email)->findByEmail();
+                        $data = $this->getModel('modelUser')->setEmail($email)->findByEmail();
 
                         if(empty($data)){
                             //7. Enregistrer le manager
-                            return $this->modelUser->setFirstname($firstname)->setLastname($lastname)->setPassword($password)->add();
+                            return $this->getModel('modelUser')->setFirstname($firstname)->setLastname($lastname)->setPassword($password)->add();
                         }else{
                             return "Email indisponible.";
                         }
@@ -134,7 +67,7 @@ class ControllerAccueil{
         return "";
     }
 
-    public function login(){
+    public function login():string{
         //CONNEXION MANAGER
         //1. Vérifier la réception du formulaire d'inscription
         if(isset($_POST["submitConnection"])){
@@ -147,7 +80,7 @@ class ControllerAccueil{
                 if(filter_var($email,FILTER_VALIDATE_EMAIL)){
                     
                     if(mb_strlen($_POST["passwordConnection"]) >= 12){
-                        $data = $this->modelUser->setEmail($email)->findByEmail();
+                        $data = $this->getModel('modelUser')->setEmail($email)->findByEmail();
                             
                         //E. Vérifier si $data est rempli -> le compte existe
                         if(!empty($data)){
@@ -194,31 +127,31 @@ class ControllerAccueil{
         return "";
     }
 
-    public function displayManagers(){
+    public function displayManagers():array{
         //LISTE DES MANAGERS
         //Vérifier si un manager est connecté
         if(isset($_SESSION["id"])){
             //Appel du modèle pour récupérer les manager
-            return $this->modelUser->findAll();
+            return $this->getModel('modelUser')->findAll();
         }
 
         return [];
     }
 
-    public function render(){
-        $this->accueil->setMessage($this->registerManager());
-        $this->accueil->setMessageConnection($this->login());
+    public function render():void{
+        $this->getView('accueil')->setMessage($this->registerManager());
+        $this->getView('accueil')->setMessageConnection($this->login());
         $data = $this->displayManagers();
 
         //Vérification du type de data
         if(gettype($data) === "array"){
-            $this->accueil->setListManagers($data);
+            $this->getView('accueil')->setListManagers($data);
         }else{
-            $this->accueil->setMessageError($data);
+            $this->getView('accueil')->setMessageError($data);
         }
 
-        $this->header->displayHeader();
-        $this->accueil->display();
+        $this->getView('header')->display();
+        $this->getView('accueil')->display();
     }
 
 }
@@ -231,7 +164,7 @@ $header = new ViewHeader("Accueil");
 $accueil = new ViewAccueil();
 
 //Instaciation du controler
-$controller = new ControllerAccueil($model,$header,$accueil);
+$controller = new ControllerAccueil(['modelUser' => $model],['header' => $header,"accueil" => $accueil]);
 
 //Lancement du rendu
 $controller->render();

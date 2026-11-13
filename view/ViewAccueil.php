@@ -1,5 +1,5 @@
 <?php
-class ViewAccueil{
+class ViewAccueil implements View{
     //ATTRIBUT
     private string $message = "";
     private string $messageConnection = "";
@@ -94,7 +94,7 @@ class ViewAccueil{
     }
 
     //METHOD
-    public function display(){
+    public function display():void{
     ?>
         <main>
                 <h1>Accueil</h1>

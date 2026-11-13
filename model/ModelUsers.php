@@ -1,5 +1,5 @@
 <?php
-class ModelUsers{
+class ModelUsers extends AbstractModel{
     //ATTRIBUT
     private int $id;
     private string $firstname;
@@ -8,12 +8,8 @@ class ModelUsers{
     private string $password;
     private string $createdAt;
     private string $role;
-    private PDO $pdo;
 
     //CONSTRUCTEUR
-    public function __construct(PDO $newPDO){
-        $this->pdo = $newPDO;
-    }
 
     //GETTER ET SETTER
     /**
@@ -163,34 +159,12 @@ class ModelUsers{
         return $this;
     }
 
-    /**
-     * Get the value of pdo
-     *
-     * @return PDO
-     */
-    public function getPdo(): PDO {
-        return $this->pdo;
-    }
-
-    /**
-     * Set the value of pdo
-     *
-     * @param PDO $pdo
-     *
-     * @return self
-     */
-    public function setPdo(PDO $pdo): self {
-        $this->pdo = $pdo;
-        return $this;
-    }
-
-
 
     //METHOD
-    public function findAll(){
+    public function findAll():array | string{
         try{
             //A.Préparer la requête
-            $request = $this->pdo->prepare("SELECT u.Id_User, u.firstname, u.lastname, u.email, u.password, u.created_at, r.role FROM users u INNER JOIN roles r ON u.Id_Role = r.Id_Role WHERE r.role = 'Manager'");
+            $request = $this->getPdo()->prepare("SELECT u.Id_User, u.firstname, u.lastname, u.email, u.password, u.created_at, r.role FROM users u INNER JOIN roles r ON u.Id_Role = r.Id_Role WHERE r.role = 'Manager'");
 
             //B.Exécuter la requête
             $request->execute();
@@ -206,10 +180,10 @@ class ModelUsers{
         }
     }
 
-    public function findByEmail(){
+    public function findByEmail():array | string{
         try{
             //A. Préparer la requête de lecture des données lié à l'email
-            $request = $this->pdo->prepare('SELECT u.Id_User, u.firstname, u.lastname, u.email, u.password, u.created_at, r.role FROM users u INNER JOIN roles r ON u.Id_Role = r.Id_Role WHERE u.email = ?');
+            $request = $this->getPdo()->prepare('SELECT u.Id_User, u.firstname, u.lastname, u.email, u.password, u.created_at, r.role FROM users u INNER JOIN roles r ON u.Id_Role = r.Id_Role WHERE u.email = ?');
 
             //B. Relier le ? à mon email
             $request->bindParam(1,$this->email,PDO::PARAM_STR);
@@ -227,10 +201,10 @@ class ModelUsers{
         }
     }
 
-    public function add(){
+    public function add():string{
         try{
             //A. Préparer la requête de lecture des données lié à l'email
-            $request = $this->pdo->prepare('INSERT INTO users (firstname, lastname, email, `password`, Id_Role) VALUES(?,?,?,?,2)');
+            $request = $this->getPdo()->prepare('INSERT INTO users (firstname, lastname, email, `password`, Id_Role) VALUES(?,?,?,?,2)');
 
             //B. Relier les ? à mes données
             $request->bindParam(1,$this->firstname,PDO::PARAM_STR);

@@ -1,5 +1,5 @@
 <?php
-class ViewAgent{
+class ViewAgent implements View{
     //ATTRIBUT
     private array $tiers;
     private array $archetypes;
@@ -91,7 +91,7 @@ class ViewAgent{
         return $this;
     }
     
-    public function display(){
+    public function display():void{
 ?>
         <main>
                 <h1>Agents of Shield</h1>

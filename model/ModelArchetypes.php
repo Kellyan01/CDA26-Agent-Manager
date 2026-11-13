@@ -1,14 +1,10 @@
 <?php
-class ModelArchetypes {
+class ModelArchetypes extends AbstractModel{
     //ATTRIBUT
     private int $id;
     private string $archetype;
-    private PDO $pdo;
 
     //CONSTRUCTEUR
-    public function __construct(PDO $newPDO){
-        $this->pdo = $newPDO;
-    }
 
     //GETTER ET SETTER
     /**
@@ -53,33 +49,12 @@ class ModelArchetypes {
         return $this;
     }
 
-    /**
-     * Get the value of pdo
-     *
-     * @return PDO
-     */
-    public function getPdo(): PDO {
-        return $this->pdo;
-    }
-
-    /**
-     * Set the value of pdo
-     *
-     * @param PDO $pdo
-     *
-     * @return self
-     */
-    public function setPdo(PDO $pdo): self {
-        $this->pdo = $pdo;
-        return $this;
-    }
-
     //METHOD
     public function findAll():array | string{
         try{
             
             //Préparation de la requêt pour Archetype
-            $request = $this->pdo->prepare("SELECT a.Id_Archetype, a.archetype FROM archetypes a");
+            $request = $this->getPdo()->prepare("SELECT a.Id_Archetype, a.archetype FROM archetypes a");
             //Execution
             $request->execute();
             //Récupération
@@ -95,7 +70,7 @@ class ModelArchetypes {
         try{
             
             //Préparation de la requêt pour Archetype
-            $request = $this->pdo->prepare("SELECT a.Id_Archetype, a.archetype FROM archetypes a WHERE a.Id_Archetype = ?");
+            $request = $this->getPdo()->prepare("SELECT a.Id_Archetype, a.archetype FROM archetypes a WHERE a.Id_Archetype = ?");
             //BindParam
             $request->bindParam(1,$this->id,PDO::PARAM_INT);
             //Execution

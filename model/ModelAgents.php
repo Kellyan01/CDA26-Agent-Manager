@@ -1,5 +1,5 @@
 <?php
-class ModelAgents{
+class ModelAgents extends AbstractModel{
     //ATTRIBUT
     private int $id;
     private string $name;
@@ -8,12 +8,8 @@ class ModelAgents{
     private string $tier;
     private string $archetype;
     private string $team;
-    private PDO $pdo;
 
     //CONSTRUCTEUR
-    public function __construct(PDO $newPDO){
-        $this->pdo = $newPDO;
-    }
 
     //GETTER ET SETTER
     /**
@@ -163,32 +159,11 @@ class ModelAgents{
         return $this;
     }
 
-    /**
-     * Get the value of pdo
-     *
-     * @return PDO
-     */
-    public function getPdo(): PDO {
-        return $this->pdo;
-    }
-
-    /**
-     * Set the value of pdo
-     *
-     * @param PDO $pdo
-     *
-     * @return self
-     */
-    public function setPdo(PDO $pdo): self {
-        $this->pdo = $pdo;
-        return $this;
-    }
-
     //METHOD
     public function findAll():array | string {
         try{
             //Préparation de la requête
-            $request = $this->pdo->prepare("SELECT a.Id_Agent, a.name, a.dob, a.created_at, t.tier, ac.archetype, te.team_name FROM agents a INNER JOIN tiers t ON t.Id_Tier = a.Id_Tier INNER JOIN archetypes ac ON ac.Id_Archetype = a.Id_Archetype LEFT JOIN Teams te ON te.Id_Team = a.Id_Team");
+            $request = $this->getPdo()->prepare("SELECT a.Id_Agent, a.name, a.dob, a.created_at, t.tier, ac.archetype, te.team_name FROM agents a INNER JOIN tiers t ON t.Id_Tier = a.Id_Tier INNER JOIN archetypes ac ON ac.Id_Archetype = a.Id_Archetype LEFT JOIN Teams te ON te.Id_Team = a.Id_Team");
 
             //Execution
             $request->execute();
@@ -204,7 +179,7 @@ class ModelAgents{
     public function findByName():array | string{
         try{
             //5.1 Préparation de la requête
-            $request = $this->pdo->prepare("SELECT a.Id_Agent, a.name, a.dob, a.created_at, t.tier, ac.archetype, te.team_name FROM agents a LEFT JOIN teams te ON a.Id_Team = te.Id_Team INNER JOIN tiers t ON a.Id_Tier = t.Id_Tier INNER JOIN archetypes ac ON a.Id_Archetype = ac.Id_Archetype WHERE a.name = ?");
+            $request = $this->getPdo()->prepare("SELECT a.Id_Agent, a.name, a.dob, a.created_at, t.tier, ac.archetype, te.team_name FROM agents a LEFT JOIN teams te ON a.Id_Team = te.Id_Team INNER JOIN tiers t ON a.Id_Tier = t.Id_Tier INNER JOIN archetypes ac ON a.Id_Archetype = ac.Id_Archetype WHERE a.name = ?");
 
             //5.2 BindParam
             $request->bindParam(1,$this->name,PDO::PARAM_STR);
@@ -222,7 +197,7 @@ class ModelAgents{
     public function add():?string{
         try{
             //8.1 Préparation de la requête
-            $request = $this->pdo->prepare("INSERT INTO agents (`name`,dob,Id_Tier, Id_Archetype) VALUES (?,?,?,?)");
+            $request = $this->getPdo()->prepare("INSERT INTO agents (`name`,dob,Id_Tier, Id_Archetype) VALUES (?,?,?,?)");
 
             //8.2 BindParam
             $request->bindParam(1,$this->name,PDO::PARAM_STR);
